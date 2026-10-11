@@ -14,7 +14,308 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ai_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          latency_ms: number
+          model: string
+          project_id: string | null
+          success: boolean
+          token_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          latency_ms: number
+          model: string
+          project_id?: string | null
+          success: boolean
+          token_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          latency_ms?: number
+          model?: string
+          project_id?: string | null
+          success?: boolean
+          token_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_data: {
+        Row: {
+          device_key: string
+          id: string
+          key: string
+          project_id: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          device_key: string
+          id?: string
+          key: string
+          project_id: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          device_key?: string
+          id?: string
+          key?: string
+          project_id?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_data_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          project_id: string
+          role: string
+          version_id_after: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          project_id: string
+          role: string
+          version_id_after?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+          role?: string
+          version_id_after?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_messages_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_messages_version_id_after_fkey"
+            columns: ["version_id_after"]
+            isOneToOne: false
+            referencedRelation: "project_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_versions: {
+        Row: {
+          created_at: string
+          created_by_message: string | null
+          id: string
+          project_id: string
+          tabs: Json
+          version_num: number
+        }
+        Insert: {
+          created_at?: string
+          created_by_message?: string | null
+          id?: string
+          project_id: string
+          tabs: Json
+          version_num: number
+        }
+        Update: {
+          created_at?: string
+          created_by_message?: string | null
+          id?: string
+          project_id?: string
+          tabs?: Json
+          version_num?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_versions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          ai_ondevice_model: string | null
+          ai_remote_endpoint: string | null
+          ai_remote_model: string | null
+          ai_runtime: string
+          created_at: string
+          current_version_id: string | null
+          icon_url: string | null
+          id: string
+          is_published: boolean
+          owner_id: string
+          prompt: string
+          slug: string
+          template_family: string
+          theme: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          ai_ondevice_model?: string | null
+          ai_remote_endpoint?: string | null
+          ai_remote_model?: string | null
+          ai_runtime?: string
+          created_at?: string
+          current_version_id?: string | null
+          icon_url?: string | null
+          id?: string
+          is_published?: boolean
+          owner_id: string
+          prompt?: string
+          slug: string
+          template_family?: string
+          theme?: Json
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_ondevice_model?: string | null
+          ai_remote_endpoint?: string | null
+          ai_remote_model?: string | null
+          ai_runtime?: string
+          created_at?: string
+          current_version_id?: string | null
+          icon_url?: string | null
+          id?: string
+          is_published?: boolean
+          owner_id?: string
+          prompt?: string
+          slug?: string
+          template_family?: string
+          theme?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      requirements: {
+        Row: {
+          created_at: string
+          id: string
+          position: number
+          project_id: string
+          source: string
+          status: string
+          text: string
+          updated_at: string
+          version_first_seen: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          position?: number
+          project_id: string
+          source?: string
+          status?: string
+          text: string
+          updated_at?: string
+          version_first_seen?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          position?: number
+          project_id?: string
+          source?: string
+          status?: string
+          text?: string
+          updated_at?: string
+          version_first_seen?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requirements_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_results: {
+        Row: {
+          created_at: string
+          id: string
+          issue_count: number
+          issues: Json
+          kind: string
+          passed: boolean
+          project_id: string
+          version_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          issue_count?: number
+          issues?: Json
+          kind: string
+          passed: boolean
+          project_id: string
+          version_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          issue_count?: number
+          issues?: Json
+          kind?: string
+          passed?: boolean
+          project_id?: string
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_results_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "test_results_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "project_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

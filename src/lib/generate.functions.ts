@@ -125,7 +125,8 @@ async function uploadIcon(ownerId: string, projectId: string, prompt: string): P
       console.error("icon upload", error);
       return null;
     }
-    const { data } = supabaseAdmin.storage.from("app-icons").getPublicUrl(path);
+    const { data: signed } = await supabaseAdmin.storage.from("app-icons").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+    const data = { publicUrl: signed?.signedUrl ?? "" };
     return data.publicUrl;
   } catch (e) {
     console.error("icon gen failed", e);
@@ -489,7 +490,8 @@ export const uploadCustomIcon = createServerFn({ method: "POST" })
       .upload(path, bytes, { contentType: data.contentType, upsert: false });
     if (upErr) throw new Error(upErr.message);
 
-    const { data: pub } = supabaseAdmin.storage.from("app-icons").getPublicUrl(path);
+    const { data: signedPub } = await supabaseAdmin.storage.from("app-icons").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+    const pub = { publicUrl: signedPub?.signedUrl ?? "" };
     const iconUrl = pub.publicUrl;
 
     const { error: updErr } = await supabaseAdmin
