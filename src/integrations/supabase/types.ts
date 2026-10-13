@@ -316,6 +316,27 @@ export type Database = {
           },
         ]
       }
+      workspace_settings: {
+        Row: {
+          git_repo_url: string | null
+          sheet_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          git_repo_url?: string | null
+          sheet_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          git_repo_url?: string | null
+          sheet_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
