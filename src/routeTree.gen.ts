@@ -14,9 +14,11 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedNewRouteImport } from './routes/_authenticated/new'
+import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
 import { Route as ASlugRouteImport } from './routes/a.$slug'
 import { Route as ApiWorkspaceChatRouteImport } from './routes/api/workspace-chat'
 import { Route as AuthenticatedEditorIdRouteImport } from './routes/_authenticated/editor.$id'
+import { Route as AuthenticatedWorkspaceIndexRouteImport } from './routes/_authenticated/workspace.index'
 import { Route as ApiGitProxySplatRouteImport } from './routes/api/git-proxy.$'
 import { Route as ApiPublicAiSlugRouteImport } from './routes/api/public/ai.$slug'
 import { Route as ApiPublicManifestSlugRouteImport } from './routes/api/public/manifest.$slug'
@@ -45,6 +47,11 @@ const AuthenticatedNewRoute = AuthenticatedNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const ASlugRoute = ASlugRouteImport.update({
   id: '/a/$slug',
   path: '/a/$slug',
@@ -60,6 +67,12 @@ const AuthenticatedEditorIdRoute = AuthenticatedEditorIdRouteImport.update({
   path: '/editor/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedWorkspaceIndexRoute =
+  AuthenticatedWorkspaceIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
 const ApiGitProxySplatRoute = ApiGitProxySplatRouteImport.update({
   id: '/api/git-proxy/$',
   path: '/api/git-proxy/$',
@@ -81,10 +94,12 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/new': typeof AuthenticatedNewRoute
+  '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/a/$slug': typeof ASlugRoute
   '/api/workspace-chat': typeof ApiWorkspaceChatRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
   '/api/git-proxy/$': typeof ApiGitProxySplatRoute
+  '/workspace/': typeof AuthenticatedWorkspaceIndexRoute
   '/api/public/ai/$slug': typeof ApiPublicAiSlugRoute
   '/api/public/manifest/$slug': typeof ApiPublicManifestSlugRoute
 }
@@ -97,6 +112,7 @@ export interface FileRoutesByTo {
   '/api/workspace-chat': typeof ApiWorkspaceChatRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
   '/api/git-proxy/$': typeof ApiGitProxySplatRoute
+  '/workspace': typeof AuthenticatedWorkspaceIndexRoute
   '/api/public/ai/$slug': typeof ApiPublicAiSlugRoute
   '/api/public/manifest/$slug': typeof ApiPublicManifestSlugRoute
 }
@@ -107,10 +123,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/new': typeof AuthenticatedNewRoute
+  '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/a/$slug': typeof ASlugRoute
   '/api/workspace-chat': typeof ApiWorkspaceChatRoute
   '/_authenticated/editor/$id': typeof AuthenticatedEditorIdRoute
   '/api/git-proxy/$': typeof ApiGitProxySplatRoute
+  '/_authenticated/workspace/': typeof AuthenticatedWorkspaceIndexRoute
   '/api/public/ai/$slug': typeof ApiPublicAiSlugRoute
   '/api/public/manifest/$slug': typeof ApiPublicManifestSlugRoute
 }
@@ -121,10 +139,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/new'
+    | '/workspace'
     | '/a/$slug'
     | '/api/workspace-chat'
     | '/editor/$id'
     | '/api/git-proxy/$'
+    | '/workspace/'
     | '/api/public/ai/$slug'
     | '/api/public/manifest/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -137,6 +157,7 @@ export interface FileRouteTypes {
     | '/api/workspace-chat'
     | '/editor/$id'
     | '/api/git-proxy/$'
+    | '/workspace'
     | '/api/public/ai/$slug'
     | '/api/public/manifest/$slug'
   id:
@@ -146,10 +167,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/dashboard'
     | '/_authenticated/new'
+    | '/_authenticated/workspace'
     | '/a/$slug'
     | '/api/workspace-chat'
     | '/_authenticated/editor/$id'
     | '/api/git-proxy/$'
+    | '/_authenticated/workspace/'
     | '/api/public/ai/$slug'
     | '/api/public/manifest/$slug'
   fileRoutesById: FileRoutesById
@@ -202,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNewRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/workspace': {
+      id: '/_authenticated/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/a/$slug': {
       id: '/a/$slug'
       path: '/a/$slug'
@@ -222,6 +252,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/editor/$id'
       preLoaderRoute: typeof AuthenticatedEditorIdRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/workspace/': {
+      id: '/_authenticated/workspace/'
+      path: '/'
+      fullPath: '/workspace/'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIndexRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
     }
     '/api/git-proxy/$': {
       id: '/api/git-proxy/$'
@@ -247,15 +284,31 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedWorkspaceRouteChildren {
+  AuthenticatedWorkspaceIndexRoute: typeof AuthenticatedWorkspaceIndexRoute
+}
+
+const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
+  {
+    AuthenticatedWorkspaceIndexRoute: AuthenticatedWorkspaceIndexRoute,
+  }
+
+const AuthenticatedWorkspaceRouteWithChildren =
+  AuthenticatedWorkspaceRoute._addFileChildren(
+    AuthenticatedWorkspaceRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNewRoute: typeof AuthenticatedNewRoute
+  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRouteWithChildren
   AuthenticatedEditorIdRoute: typeof AuthenticatedEditorIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNewRoute: AuthenticatedNewRoute,
+  AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRouteWithChildren,
   AuthenticatedEditorIdRoute: AuthenticatedEditorIdRoute,
 }
 
