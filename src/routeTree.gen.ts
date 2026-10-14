@@ -19,6 +19,9 @@ import { Route as ASlugRouteImport } from './routes/a.$slug'
 import { Route as ApiWorkspaceChatRouteImport } from './routes/api/workspace-chat'
 import { Route as AuthenticatedEditorIdRouteImport } from './routes/_authenticated/editor.$id'
 import { Route as AuthenticatedWorkspaceIndexRouteImport } from './routes/_authenticated/workspace.index'
+import { Route as AuthenticatedWorkspaceChatRouteImport } from './routes/_authenticated/workspace.chat'
+import { Route as AuthenticatedWorkspaceGitRouteImport } from './routes/_authenticated/workspace.git'
+import { Route as AuthenticatedWorkspaceSettingsRouteImport } from './routes/_authenticated/workspace.settings'
 import { Route as ApiGitProxySplatRouteImport } from './routes/api/git-proxy.$'
 import { Route as ApiPublicAiSlugRouteImport } from './routes/api/public/ai.$slug'
 import { Route as ApiPublicManifestSlugRouteImport } from './routes/api/public/manifest.$slug'
@@ -73,6 +76,24 @@ const AuthenticatedWorkspaceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedWorkspaceRoute,
   } as any)
+const AuthenticatedWorkspaceChatRoute =
+  AuthenticatedWorkspaceChatRouteImport.update({
+    id: '/chat',
+    path: '/chat',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceGitRoute =
+  AuthenticatedWorkspaceGitRouteImport.update({
+    id: '/git',
+    path: '/git',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceSettingsRoute =
+  AuthenticatedWorkspaceSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
 const ApiGitProxySplatRoute = ApiGitProxySplatRouteImport.update({
   id: '/api/git-proxy/$',
   path: '/api/git-proxy/$',
@@ -98,6 +119,9 @@ export interface FileRoutesByFullPath {
   '/a/$slug': typeof ASlugRoute
   '/api/workspace-chat': typeof ApiWorkspaceChatRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
+  '/workspace/chat': typeof AuthenticatedWorkspaceChatRoute
+  '/workspace/git': typeof AuthenticatedWorkspaceGitRoute
+  '/workspace/settings': typeof AuthenticatedWorkspaceSettingsRoute
   '/api/git-proxy/$': typeof ApiGitProxySplatRoute
   '/workspace/': typeof AuthenticatedWorkspaceIndexRoute
   '/api/public/ai/$slug': typeof ApiPublicAiSlugRoute
@@ -111,6 +135,9 @@ export interface FileRoutesByTo {
   '/a/$slug': typeof ASlugRoute
   '/api/workspace-chat': typeof ApiWorkspaceChatRoute
   '/editor/$id': typeof AuthenticatedEditorIdRoute
+  '/workspace/chat': typeof AuthenticatedWorkspaceChatRoute
+  '/workspace/git': typeof AuthenticatedWorkspaceGitRoute
+  '/workspace/settings': typeof AuthenticatedWorkspaceSettingsRoute
   '/api/git-proxy/$': typeof ApiGitProxySplatRoute
   '/workspace': typeof AuthenticatedWorkspaceIndexRoute
   '/api/public/ai/$slug': typeof ApiPublicAiSlugRoute
@@ -127,6 +154,9 @@ export interface FileRoutesById {
   '/a/$slug': typeof ASlugRoute
   '/api/workspace-chat': typeof ApiWorkspaceChatRoute
   '/_authenticated/editor/$id': typeof AuthenticatedEditorIdRoute
+  '/_authenticated/workspace/chat': typeof AuthenticatedWorkspaceChatRoute
+  '/_authenticated/workspace/git': typeof AuthenticatedWorkspaceGitRoute
+  '/_authenticated/workspace/settings': typeof AuthenticatedWorkspaceSettingsRoute
   '/api/git-proxy/$': typeof ApiGitProxySplatRoute
   '/_authenticated/workspace/': typeof AuthenticatedWorkspaceIndexRoute
   '/api/public/ai/$slug': typeof ApiPublicAiSlugRoute
@@ -143,6 +173,9 @@ export interface FileRouteTypes {
     | '/a/$slug'
     | '/api/workspace-chat'
     | '/editor/$id'
+    | '/workspace/chat'
+    | '/workspace/git'
+    | '/workspace/settings'
     | '/api/git-proxy/$'
     | '/workspace/'
     | '/api/public/ai/$slug'
@@ -156,6 +189,9 @@ export interface FileRouteTypes {
     | '/a/$slug'
     | '/api/workspace-chat'
     | '/editor/$id'
+    | '/workspace/chat'
+    | '/workspace/git'
+    | '/workspace/settings'
     | '/api/git-proxy/$'
     | '/workspace'
     | '/api/public/ai/$slug'
@@ -171,6 +207,9 @@ export interface FileRouteTypes {
     | '/a/$slug'
     | '/api/workspace-chat'
     | '/_authenticated/editor/$id'
+    | '/_authenticated/workspace/chat'
+    | '/_authenticated/workspace/git'
+    | '/_authenticated/workspace/settings'
     | '/api/git-proxy/$'
     | '/_authenticated/workspace/'
     | '/api/public/ai/$slug'
@@ -260,6 +299,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceIndexRouteImport
       parentRoute: typeof AuthenticatedWorkspaceRoute
     }
+    '/_authenticated/workspace/chat': {
+      id: '/_authenticated/workspace/chat'
+      path: '/chat'
+      fullPath: '/workspace/chat'
+      preLoaderRoute: typeof AuthenticatedWorkspaceChatRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/git': {
+      id: '/_authenticated/workspace/git'
+      path: '/git'
+      fullPath: '/workspace/git'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGitRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/settings': {
+      id: '/_authenticated/workspace/settings'
+      path: '/settings'
+      fullPath: '/workspace/settings'
+      preLoaderRoute: typeof AuthenticatedWorkspaceSettingsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
     '/api/git-proxy/$': {
       id: '/api/git-proxy/$'
       path: '/api/git-proxy/$'
@@ -285,11 +345,17 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedWorkspaceRouteChildren {
+  AuthenticatedWorkspaceChatRoute: typeof AuthenticatedWorkspaceChatRoute
+  AuthenticatedWorkspaceGitRoute: typeof AuthenticatedWorkspaceGitRoute
+  AuthenticatedWorkspaceSettingsRoute: typeof AuthenticatedWorkspaceSettingsRoute
   AuthenticatedWorkspaceIndexRoute: typeof AuthenticatedWorkspaceIndexRoute
 }
 
 const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
   {
+    AuthenticatedWorkspaceChatRoute: AuthenticatedWorkspaceChatRoute,
+    AuthenticatedWorkspaceGitRoute: AuthenticatedWorkspaceGitRoute,
+    AuthenticatedWorkspaceSettingsRoute: AuthenticatedWorkspaceSettingsRoute,
     AuthenticatedWorkspaceIndexRoute: AuthenticatedWorkspaceIndexRoute,
   }
 
