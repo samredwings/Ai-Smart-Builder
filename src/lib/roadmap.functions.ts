@@ -133,6 +133,48 @@ export const runStaticTests = createServerFn({ method: "POST" })
     return runStaticTestsForCurrentVersion(data.projectId);
   });
 
+// ---------- V2 Feature & Intent Extraction Engine ----------
+
+export function detectIntent(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("dashboard") || lower.includes("stats") || lower.includes("metric")) return "dashboard";
+  if (lower.includes("theme") || lower.includes("color") || lower.includes("dark") || lower.includes("style")) return "theme";
+  if (lower.includes("storage") || lower.includes("persist") || lower.includes("save") || lower.includes("remember")) return "storage";
+  if (lower.includes("tab") || lower.includes("screen") || lower.includes("page")) return "tab";
+  if (lower.includes("auth") || lower.includes("login") || lower.includes("sign")) return "auth";
+  if (lower.includes("list") || lower.includes("entries") || lower.includes("log") || lower.includes("catalog")) return "list";
+  return "default";
+}
+
+export function extractKeywordRequirements(message: string, currentVersion: number) {
+  const newReqs: Array<{ text: string; source: "added" | "original"; status: "planned"; versionFirstSeen: number }> = [];
+  const lower = message.toLowerCase();
+
+  const featureMap: Array<{ keywords: string[]; text: string }> = [
+    { keywords: ["dashboard", "stats", "metric"], text: "Dashboard tab with key metrics and charts" },
+    { keywords: ["dark theme", "dark mode"], text: "Dark mode theme with system preference detection" },
+    { keywords: ["storage", "persist", "save"], text: "Local data persistence with client storage" },
+    { keywords: ["search", "filter"], text: "Search and filter functionality for lists" },
+    { keywords: ["auth", "login"], text: "User authentication with session management" },
+    { keywords: ["notification", "alert"], text: "Push notification support" },
+    { keywords: ["camera", "photo"], text: "Camera and photo library access" },
+    { keywords: ["map", "location"], text: "Map integration with location services" },
+  ];
+
+  for (const { keywords, text } of featureMap) {
+    if (keywords.some((k) => lower.includes(k))) {
+      newReqs.push({
+        text,
+        source: "added",
+        status: "planned",
+        versionFirstSeen: currentVersion,
+      });
+    }
+  }
+
+  return newReqs.slice(0, 2);
+}
+
 // ---------- BRD / Requirements ----------
 
 const EXTRACT_TOOL = {
@@ -218,6 +260,7 @@ ${opts.assistantReply}`;
     mark_changed?: string[];
     remove?: string[];
   };
+
   try {
     decision = await callAIWithTool({
       model: "google/gemini-3-flash-preview",
@@ -229,8 +272,19 @@ ${opts.assistantReply}`;
       projectId: opts.projectId,
     });
   } catch (e) {
-    console.error("[brd] extract failed:", e);
-    return;
+    console.error("[brd] AI extract failed, using V2 keyword extractor fallback:", e);
+    const fallback = extractKeywordRequirements(opts.userMessage, opts.versionNum);
+    decision = { add: fallback };
+  }
+
+  // If AI did not find any additions, test keyword extraction to make sure core features are captured
+  if (!decision.add || decision.add.length === 0) {
+    const keywordMatches = extractKeywordRequirements(opts.userMessage, opts.versionNum);
+    const existingTexts = new Set(list.map((r) => r.text.toLowerCase()));
+    const unrecorded = keywordMatches.filter((k) => !existingTexts.has(k.text.toLowerCase()));
+    if (unrecorded.length > 0) {
+      decision.add = unrecorded;
+    }
   }
 
   const existingIds = new Set(list.map((r) => r.id));
@@ -305,7 +359,6 @@ export const updateRequirement = createServerFn({ method: "POST" })
       .parse(input)
   )
   .handler(async ({ data, context }) => {
-    // RLS scopes to owner via projects join.
     const { data: row } = await supabaseAdmin
       .from("requirements")
       .select("id, project_id")
@@ -377,3 +430,4 @@ export const deleteRequirement = createServerFn({ method: "POST" })
     await supabaseAdmin.from("requirements").delete().eq("id", data.id);
     return { ok: true };
   });
+                                             
