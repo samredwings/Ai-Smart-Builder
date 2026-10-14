@@ -27,6 +27,9 @@ function AuthedLayout() {
             App Forge
           </Link>
           <div className="flex items-center gap-2">
+            <Link to="/workspace/chat">
+              <Button size="sm" variant="outline">Workspace</Button>
+            </Link>
             <Link to="/new">
               <Button size="sm">New app</Button>
             </Link>
